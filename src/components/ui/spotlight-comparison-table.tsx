@@ -398,7 +398,7 @@ export function SpotlightComparisonTable({
   };
 
   const planVisibility = (id: string) =>
-    id === activeId ? "" : "@max-[480px]/compare:hidden";
+    id === activeId ? "" : "hidden md:table-cell";
 
   return (
     <div
@@ -407,26 +407,26 @@ export function SpotlightComparisonTable({
       data-selected-plan={activeId}
       data-differences={onlyDifferences}
       className={cn(
-        "@container/compare w-full min-w-0 text-[#051A24] select-none",
+        "w-full min-w-0 text-[#051A24] select-none",
         className
       )}
     >
       <div className="overflow-hidden rounded-none border border-slate-200/90 bg-white shadow-xl">
         {/* Top bar with auto status and Differences Switch */}
-        <div className="flex min-h-12 items-center justify-between gap-2 border-b border-slate-200/80 bg-slate-50/80 px-4 py-2">
-          <div className="flex items-center gap-2.5">
+        <div className="flex flex-col sm:flex-row sm:min-h-12 sm:items-center justify-between gap-2.5 border-b border-slate-200/80 bg-slate-50/80 px-3 sm:px-4 py-2.5 sm:py-2">
+          <div className="flex items-center justify-between sm:justify-start gap-2.5">
             <p id={headingId} className="truncate text-xs font-semibold text-[#0D212C]">
               {labels.caption ?? "Comparatif des offres"}
             </p>
             {autoplay && (
-              <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-none bg-emerald-100/80 border border-emerald-300/60 text-[10px] font-mono text-emerald-800">
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-none bg-emerald-100/80 border border-emerald-300/60 text-[10px] font-mono text-emerald-800">
                 <span className="size-1.5 rounded-none bg-emerald-500 animate-pulse" />
-                {paused ? "Pause (clic)" : "Démo automatique"}
+                {paused ? "Pause" : "Démo auto"}
               </span>
             )}
           </div>
 
-          <div className="flex shrink-0 items-center gap-3">
+          <div className="flex items-center justify-end gap-2.5">
             {autoplay && (
               <button
                 type="button"
@@ -457,7 +457,7 @@ export function SpotlightComparisonTable({
                 pauseTemporarily();
                 filterRows(!onlyDifferences);
               }}
-              className="flex items-center gap-2 rounded-none bg-white px-3 py-1.5 border border-slate-200 shadow-xs text-[11px] font-medium text-[#0D212C] hover:bg-slate-50 transition-all active:scale-98"
+              className="flex items-center gap-2 rounded-none bg-white px-2.5 sm:px-3 py-1.5 border border-slate-200 shadow-xs text-[11px] font-medium text-[#0D212C] hover:bg-slate-50 transition-all active:scale-98"
             >
               <span>{labels.differences ?? "Différences uniquement"}</span>
               <span
@@ -486,29 +486,44 @@ export function SpotlightComparisonTable({
             <div
               role="radiogroup"
               aria-label={labels.selectPlan ?? "Select a plan"}
-              className="hidden gap-1.5 border-b border-slate-200 bg-slate-50/50 p-2 @max-[480px]/compare:flex"
+              className="flex md:hidden gap-1.5 border-b border-slate-200 bg-slate-50/80 p-2"
             >
-              {plans.map((plan) => (
-                <button
-                  type="button"
-                  role="radio"
-                  key={plan.id}
-                  aria-checked={plan.id === activeId}
-                  onClick={() => choose(plan.id)}
-                  className={cn(
-                    "min-w-0 flex-1 truncate rounded-none px-2.5 py-2 text-xs font-semibold transition-all",
-                    plan.id === activeId
-                      ? plan.id === "business"
-                        ? "bg-[#051A24] text-white shadow-md"
-                        : plan.id === "elite"
-                        ? "bg-[#FFF6E5] text-[#1E1B18] border border-amber-300 shadow-xs"
-                        : "bg-[#EEF4F8] text-[#0F172A] border border-slate-300 shadow-xs"
-                      : "text-slate-600 hover:bg-slate-100"
-                  )}
-                >
-                  {plan.name}
-                </button>
-              ))}
+              {plans.map((plan) => {
+                const isSelected = plan.id === activeId;
+                return (
+                  <button
+                    type="button"
+                    role="radio"
+                    key={plan.id}
+                    aria-checked={isSelected}
+                    onClick={() => choose(plan.id)}
+                    className={cn(
+                      "min-w-0 flex-1 flex flex-col items-center justify-center rounded-none px-1.5 py-2 text-xs transition-all",
+                      isSelected
+                        ? plan.id === "business"
+                          ? "bg-[#051A24] text-white shadow-md font-bold"
+                          : plan.id === "elite"
+                          ? "bg-[#FFF6E5] text-[#1E1B18] border border-amber-300 shadow-xs font-bold"
+                          : "bg-[#EEF4F8] text-[#0F172A] border border-slate-300 shadow-xs font-bold"
+                        : "text-slate-600 hover:bg-slate-100 font-medium"
+                    )}
+                  >
+                    <span className="truncate w-full text-center text-[11px]">{plan.name}</span>
+                    <span
+                      className={cn(
+                        "text-[10px] mt-0.5 font-mono",
+                        isSelected
+                          ? plan.id === "business"
+                            ? "text-[#d5e14e]"
+                            : "text-slate-800"
+                          : "text-slate-400"
+                      )}
+                    >
+                      {plan.price}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Main Stage */}
@@ -520,17 +535,16 @@ export function SpotlightComparisonTable({
                 style={
                   {
                     "--spotlight-index": activeIndex,
-                    width: `${66 / plans.length}%`,
                   } as React.CSSProperties
                 }
                 className={cn(
-                  "pointer-events-none absolute inset-y-0 left-[34%] z-0 translate-x-[calc(var(--spotlight-index)*100%)] rounded-none transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] border-x",
+                  "pointer-events-none absolute inset-y-0 z-0 rounded-none transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] border-x",
+                  "left-[52%] w-[48%] translate-x-0 md:left-[34%] md:w-[22%] md:translate-x-[calc(var(--spotlight-index)*100%)]",
                   activeId === "business"
                     ? "bg-[#051A24]/[0.04] border-[#051A24]/20"
                     : activeId === "elite"
                     ? "bg-amber-500/[0.05] border-amber-400/30"
-                    : "bg-blue-500/[0.04] border-blue-400/25",
-                  "@max-[480px]/compare:left-[52%] @max-[480px]/compare:w-[48%]! @max-[480px]/compare:translate-x-0"
+                    : "bg-blue-500/[0.04] border-blue-400/25"
                 )}
               >
                 {/* Glowing Top Flare on Active Column */}
@@ -563,9 +577,16 @@ export function SpotlightComparisonTable({
                 className="relative z-10 w-full table-fixed border-collapse text-[11px]"
               >
                 <colgroup>
-                  <col className="w-[34%] @max-[480px]/compare:w-[52%]" />
+                  <col className="w-[52%] md:w-[34%]" />
                   {plans.map((plan) => (
-                    <col key={plan.id} className={planVisibility(plan.id)} />
+                    <col
+                      key={plan.id}
+                      className={cn(
+                        plan.id === activeId
+                          ? "w-[48%] md:w-[22%]"
+                          : "hidden md:table-column md:w-[22%]"
+                      )}
+                    />
                   ))}
                 </colgroup>
 
@@ -776,10 +797,10 @@ export function SpotlightComparisonTable({
                             >
                               <div
                                 data-row-content
-                                className="flex h-8 items-center overflow-hidden px-4"
+                                className="flex min-h-9 sm:h-8 items-center overflow-hidden px-3 sm:px-4 py-1"
                               >
                                 <span
-                                  className="truncate text-[11px] font-medium text-slate-700"
+                                  className="text-[10.5px] sm:text-[11px] font-medium text-slate-700 leading-tight line-clamp-2"
                                   title={feature.label}
                                 >
                                   {feature.label}
@@ -801,12 +822,12 @@ export function SpotlightComparisonTable({
                                 >
                                   <div
                                     data-row-content
-                                    className="relative flex h-8 items-center justify-center overflow-hidden px-2"
+                                    className="relative flex min-h-9 sm:h-8 items-center justify-center overflow-hidden px-2 py-1"
                                   >
                                     <span
                                       data-value
                                       className={cn(
-                                        "relative inline-flex min-w-0 items-center justify-center",
+                                        "relative inline-flex min-w-0 items-center justify-center text-center",
                                         isPlanActive
                                           ? "font-bold text-[#051A24]"
                                           : "text-slate-600"
@@ -834,7 +855,7 @@ export function SpotlightComparisonTable({
                                       ) : (
                                         <span
                                           className={cn(
-                                            "truncate text-[11px]",
+                                            "text-[10.5px] sm:text-[11px] leading-tight px-1",
                                             isPlanActive && "font-semibold text-[#051A24]"
                                           )}
                                         >

@@ -137,7 +137,7 @@ export const PricingSection: React.FC = () => {
   const { ref: sectionRef, isInView } = useInViewAnimation<HTMLElement>({ threshold: 0.1 });
 
   return (
-    <section ref={sectionRef} className="w-full py-20 px-4 sm:px-6 md:px-8 bg-[#F7F5F0]">
+    <section ref={sectionRef} className="w-full py-16 sm:py-20 px-3 sm:px-6 md:px-8 bg-[#F7F5F0]">
       <div className="max-w-6xl mx-auto flex flex-col items-center">
         {/* Header */}
         <div
